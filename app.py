@@ -12,10 +12,7 @@ from bokeh.io import export_png
 import tempfile
 
 st.title("Day0 automated gating system")
-# destination = st.text_input("Enter your destination")
-# days = st.number_input("Number of days: ", min_value=1)
-# budget_leve = st.selectbox("Select Budget level:", ["Low", "Medium", "High"])
-# interests = st.multiselect("Select your interests:", ["Adventure", "Culture", "Food", "History", "Nature", "Shopping", "Relaxation"])
+
 
 uploaded_files = st.file_uploader("Choose fcs files", accept_multiple_files=True)
 
