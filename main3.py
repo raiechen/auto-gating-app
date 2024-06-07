@@ -1,3 +1,4 @@
+import streamlit as st
 import flowkit as fk
 from bokeh.plotting import figure, show
 from bokeh.layouts import gridplot
@@ -182,7 +183,8 @@ transformations6 = {
 
 
 # Apply transformations
-def process_fcs_file_SLM(fcs_files):
+def process_fcs_file_SLM(fcs_files, on, numoffcs):
+    grids = []
     df_reports = pd.DataFrame()
     df_all_reports = pd.DataFrame()
 
@@ -492,11 +494,13 @@ def process_fcs_file_SLM(fcs_files):
 
 
         grid = gridplot([[p, p2, p3], [p4, p5, p6]])
+        grids.append(grid)
 
-        show(grid)
-
-
-
+     
+    if on and numoffcs<=5:
+        for grid in grids:
+            st.bokeh_chart(grid)
+    
     return (df_all_reports)
     # Export the DataFrame to an Excel file
    

@@ -11,26 +11,16 @@ from main3 import process_fcs_file_SLM
 from bokeh.io import export_png
 import tempfile
 
-st.title("Day0 automated gating system")
+
+st.title("Day-0 Automated Gating Analyzer")
 
 
 uploaded_files = st.file_uploader("Choose fcs files", accept_multiple_files=True)
+on = st.toggle("Load Plot (automatically toggle off when more than 5 files are uploaded)", value=True)
 
 
-
-# fcs_files = []
-# if uploaded_files:
-#     for uploaded_file in uploaded_files:
-#         # Create a unique file name based on the original file name and a unique identifier
-#         tmp_path = os.path.join(tempfile.gettempdir(), uploaded_file.name)
-
-#         # Write the uploaded file's contents to the temporary file
-#         with open(tmp_path, 'wb') as tmp:
-#             tmp.write(uploaded_file.getvalue())
-
-#         # Now you can use tmp_path as the file path
-#         fcs_files.append(tmp_path)
-
+#progress_bar = st.empty()
+progress_bar = st.progress(0)
 
 
 fcs_files = []
@@ -46,6 +36,7 @@ if uploaded_files:
 
         # Now you can use tmp_path as the file path
         fcs_files.append(tmp_path)
+        
 
 
 
@@ -232,7 +223,7 @@ if fcs_files:
 
 
         # Gate 1: PeakTime and CD45
-        dim_a = fk.Dimension('PeakTime', range_max=4e7, range_min=2e6)
+        dim_a = fk.Dimension('PeakTime', range_max=4e7, range_min=0)
         dim_b = fk.Dimension('CD45', range_min=100, range_max=1e5)
         rect_top_left_gate = fk.gates.RectangleGate('CD45sub', dimensions=[dim_a, dim_b])
         g_strat.add_gate(rect_top_left_gate, gate_path=('root',))
@@ -250,7 +241,7 @@ if fcs_files:
                 size=5, color="green", alpha=0.5, legend_label='Gated Events')
 
         # Add BoxAnnotation for the gated region
-        gate_annotation = BoxAnnotation(left=2e6, right=4e7,
+        gate_annotation = BoxAnnotation(left=0, right=4e7,
                                         bottom=100, top=1e5,
                                         fill_alpha=0.1, fill_color='green')
 
@@ -583,15 +574,26 @@ if fcs_files:
 
 
     if unprocessed_files:
-        df_process_SLM = process_fcs_file_SLM(unprocessed_files)
+        numoffcs = len(fcs_files)
+        df_process_SLM = process_fcs_file_SLM(unprocessed_files, on, numoffcs)
         df_all_reports = pd.concat([df_all_reports, df_process_SLM], ignore_index=True)
 
     df_all_reports = df_all_reports[['sample', 'gate_name', 'gate_type',
                                     'count', 'absolute_percent', 'gate_strategy']]
 
     st.dataframe(df_all_reports, width=5000)
-    for grid in grids:
-        st.bokeh_chart(grid)
+   
     
+    
+    if on and len(fcs_files)<=5:
+        for i, grid in enumerate(grids):
+            # Update the progress bar
+            progress_bar.progress((i + 1) / len(grids))
+            st.bokeh_chart(grid)
+    
+    # Set the progress bar to 100% when done
+    progress_bar.progress(100)
+    # Remove the progress bar when done
+    #progress_bar.empty()
     
 #df_all_reports.to_excel("Day0-flow-data-all-final-report.xlsx", index=False)
