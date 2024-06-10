@@ -8,11 +8,10 @@ from sklearn.cluster import DBSCAN
 import os
 import pandas as pd
 from main3 import process_fcs_file_SLM
-from bokeh.io import export_png
 import tempfile
 
 
-st.title("Day-0 Automated Gating Analyzer")
+st.title("Day-0 Automated Gating APP")
 
 
 uploaded_files = st.file_uploader("Choose fcs files", accept_multiple_files=True)
