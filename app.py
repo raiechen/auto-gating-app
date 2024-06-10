@@ -264,6 +264,10 @@ if fcs_files:
         # Apply DBSCAN clustering
         dbscan = DBSCAN(eps=0.06, min_samples=100).fit(df_events_transformed2[['FSC-area', 'SigResidual']])
         labels = dbscan.labels_
+        n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+        if n_clusters > 2:
+            unprocessed_files.append(fcs_file)
+            continue  # Skip the rest of the loop
         # Perform GMM clustering
         #gmm = GaussianMixture(n_components=2).fit(df_events_transformed2[['FSC-area', 'SigResidual']])
         # Get the cluster labels for each data point
